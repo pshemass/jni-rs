@@ -4,9 +4,12 @@ use std::marker::PhantomData;
 
 use std::iter::IntoIterator;
 
+use std::slice;
+use std::vec::Vec;
+
 use errors::*;
 
-use sys::{self, jvalue, jint, jsize, jbyte};
+use sys::{self, jvalue, jint, jsize, jbyte, jdoubleArray, JNI_TRUE};
 
 use strings::JNIString;
 use strings::JavaStr;
@@ -19,6 +22,7 @@ use objects::JString;
 use objects::JThrowable;
 use objects::JMethodID;
 use objects::GlobalRef;
+use objects::JArray;
 
 use descriptors::Desc;
 use descriptors::ClassDesc;
@@ -688,4 +692,15 @@ impl<'a> JNIEnv<'a> {
         let ffi_str = from.into();
         Ok(jni_call!(self.internal, NewStringUTF, ffi_str.as_ptr()))
     }
+
+    pub fn get_elements(&self, obj: JArray) -> Result<Vec<f64>> {
+
+        Ok(unsafe {
+            let l = jni_unchecked!(self.internal, GetArrayLength, obj.into_inner());
+            let elems = jni_call!(self.internal, GetDoubleArrayElements, obj.into_inner(), &mut JNI_TRUE);
+            Vec::from_raw_parts(elems, l as usize, l as usize)
+        })
+
+    }
+
 }

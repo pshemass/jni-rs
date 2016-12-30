@@ -20,6 +20,9 @@ pub use self::jstring::*;
 mod jmap;
 pub use self::jmap::*;
 
+mod jarray;
+pub use self::jarray::*;
+
 // For when you want to store a reference to a java object
 mod global_ref;
 pub use self::global_ref::*;
